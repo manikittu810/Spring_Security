@@ -1,16 +1,14 @@
-package com.spring.security.springsecurity.basic;
+package com.spring.security.springsecurity.jwt;
 
-import org.springframework.boot.autoconfigure.jms.artemis.ArtemisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
@@ -22,8 +20,8 @@ import javax.sql.DataSource;
 
 import static org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl.DEFAULT_USER_SCHEMA_DDL_LOCATION;
 
-//@Configuration
-public class BasicSecurityConfiguration {
+@Configuration
+public class JwtSecurityConfiguration {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,6 +30,7 @@ public class BasicSecurityConfiguration {
         http.httpBasic();
         http.csrf().disable();
         http.headers().frameOptions().sameOrigin();
+        http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
         return http.build();
     }
 
@@ -64,7 +63,7 @@ public class BasicSecurityConfiguration {
                 .build();
         var admin = User
                 .withUsername("admin")
-               // .password("{noop}mks123")
+                // .password("{noop}mks123")
                 .password("mks123").passwordEncoder(str -> passwordEncoder().encode(str))
                 .roles("ADMIN")
                 .build();
@@ -79,4 +78,9 @@ public class BasicSecurityConfiguration {
     public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
+
+//    @Bean
+//    public JWTDecoder jwtDecoder(){
+//
+//    }
 }
